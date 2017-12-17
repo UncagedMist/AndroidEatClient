@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:hint="@string/phone_number"
             android:textColorHint="@android:color/white"
-            android:text="8904215152"
+            android:text="5152"
             android:textSize="34sp"
             android:inputType="phone"
             app:met_baseColor="@android:color/white"
