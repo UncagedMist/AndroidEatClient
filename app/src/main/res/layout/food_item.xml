@@ -18,17 +18,35 @@
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
             android:src="@drawable/background"/>
-
-        <TextView
-            android:id="@+id/food_name"
+        
+        <LinearLayout
+            android:weightSum="10"
+            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:textColor="@android:color/white"
-            android:background="@color/overlayBackgroundMenu"
-            android:gravity="center_horizontal"
-            android:textSize="20sp"
-            android:text="Name Of Food"/>
+            android:background="@color/overlayBackgroundMenu">
 
+            <TextView
+                android:id="@+id/food_name"
+                android:layout_weight="9"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:gravity="center_horizontal"
+                android:textSize="20sp"
+                android:text="Name Of Food"/>
+
+            <ImageView
+                android:id="@+id/fav"
+                android:src="@drawable/ic_favorite_border_black_24dp"
+                android:layout_weight="1"
+                android:tint="@android:color/white"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
+
+
+        </LinearLayout>
     </RelativeLayout>
 </android.support.v7.widget.CardView>

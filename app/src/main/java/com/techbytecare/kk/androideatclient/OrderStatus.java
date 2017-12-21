@@ -13,6 +13,8 @@ import com.techbytecare.kk.androideatclient.Common.Common;
 import com.techbytecare.kk.androideatclient.Model.Request;
 import com.techbytecare.kk.androideatclient.ViewHolder.OrderViewHolder;
 
+import static com.techbytecare.kk.androideatclient.Common.Common.convertCodeToStatus;
+
 public class OrderStatus extends AppCompatActivity {
 
     RecyclerView recyclerView;
@@ -38,7 +40,14 @@ public class OrderStatus extends AppCompatActivity {
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        loadOrders(Common.currentUser.getPhone());
+        //if we start orderStatus from home activity
+        //we will not put any extra , so we just load order from common
+        if (getIntent() == null) {
+            loadOrders(Common.currentUser.getPhone());
+        }
+        else    {
+            loadOrders(getIntent().getStringExtra("userPhone"));
+        }
     }
 
     private void loadOrders(String phoneNumber) {
@@ -50,22 +59,12 @@ public class OrderStatus extends AppCompatActivity {
             @Override
             protected void populateViewHolder(OrderViewHolder viewHolder, Request model, int position) {
                 viewHolder.txtOrderId.setText(adapter.getRef(position).getKey());
-                viewHolder.txtOrderStatus.setText(convertCodeToStatus(model.getStatus()));
+                viewHolder.txtOrderStatus.setText(Common.convertCodeToStatus(model.getStatus()));
                 viewHolder.txtOrderAddress.setText(model.getAddress());
                 viewHolder.txtOrderPhone.setText(model.getPhone());
             }
         };
         adapter.notifyDataSetChanged();
         recyclerView.setAdapter(adapter);
-    }
-
-    private String convertCodeToStatus(String status) {
-        if (status.equals("0")){
-            return "Placed";
-        } else if(status.equals("1")) {
-            return "On My Way";
-        } else {
-            return "Shipped";
-        }
     }
 }

@@ -3,7 +3,6 @@ package com.techbytecare.kk.androideatclient;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -21,11 +20,15 @@ import android.widget.Toast;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.squareup.picasso.Picasso;
 import com.techbytecare.kk.androideatclient.Common.Common;
 import com.techbytecare.kk.androideatclient.Interface.ItemClickListener;
 import com.techbytecare.kk.androideatclient.Model.Category;
+import com.techbytecare.kk.androideatclient.Model.Token;
 import com.techbytecare.kk.androideatclient.ViewHolder.MenuViewHolder;
+
+import io.paperdb.Paper;
 
 public class Home extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -52,6 +55,8 @@ public class Home extends AppCompatActivity
         //init firebase
         database = FirebaseDatabase.getInstance();
         category = database.getReference("Category");
+
+        Paper.init(this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -82,7 +87,22 @@ public class Home extends AppCompatActivity
         layoutManager = new LinearLayoutManager(this);
         recycler_menu.setLayoutManager(layoutManager);
 
-        loadMenu();
+        if (Common.isConnectedToInternet(this)) {
+            loadMenu();
+        }
+        else {
+            Toast.makeText(this, "Please Check Your Internet Connection", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        updateToken(FirebaseInstanceId.getInstance().getToken());
+    }
+
+    private void updateToken(String token) {
+        FirebaseDatabase db = FirebaseDatabase.getInstance();
+        DatabaseReference tokens = db.getReference("Tokens");
+        Token data = new Token(token,false);  //false bcz : token sent from client side
+        tokens.child(Common.currentUser.getPhone()).setValue(data);
     }
 
     private void loadMenu() {
@@ -127,12 +147,17 @@ public class Home extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+
         getMenuInflater().inflate(R.menu.home, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (item.getItemId() == R.id.refresh)   {
+            loadMenu();
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -155,6 +180,9 @@ public class Home extends AppCompatActivity
             startActivity(orderStatusIntent);
         }
         else if (id == R.id.nav_log_out) {
+            //delete remember user and password
+            Paper.book().destroy();
+
             //logout
             Intent signOutIntent = new Intent(Home.this,SignIn.class);
             signOutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
