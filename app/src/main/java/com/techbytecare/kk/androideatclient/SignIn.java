@@ -80,7 +80,7 @@ public class SignIn extends AppCompatActivity {
                     mDialog.setCanceledOnTouchOutside(false);
                     mDialog.show();
 
-                    table_user.addValueEventListener(new ValueEventListener() {
+                    table_user.addListenerForSingleValueEvent(new ValueEventListener() {
 
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -92,6 +92,7 @@ public class SignIn extends AppCompatActivity {
 
                                     //check if user doesn't exist in database
                                     if (dataSnapshot.child(edtPhone.getText().toString()).exists()) {
+
                                         //get user information
                                         mDialog.dismiss();
                                         User user = dataSnapshot.child(edtPhone.getText().toString()).getValue(User.class);
@@ -105,7 +106,10 @@ public class SignIn extends AppCompatActivity {
                                             Common.currentUser = user;
                                             startActivity(homeIntent);
                                             finish();
-                                        } else {
+
+                                            table_user.removeEventListener(this);
+                                        }
+                                        else {
                                             mDialog.dismiss();
                                             Toast.makeText(SignIn.this, "Wrong Password!!!", Toast.LENGTH_SHORT).show();
                                         }
@@ -163,7 +167,8 @@ public class SignIn extends AppCompatActivity {
 
                          if (user.getSecureCode().equals(edtSecureCode.getText().toString())) {
                                 Toast.makeText(SignIn.this, "Your Password : " + user.getPassword(), Toast.LENGTH_LONG).show();
-                            } else {
+                            }
+                            else {
                                 Toast.makeText(SignIn.this, "Wrong Secure-Code!!", Toast.LENGTH_SHORT).show();
                             }
                         }

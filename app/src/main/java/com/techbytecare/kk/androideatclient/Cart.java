@@ -10,8 +10,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -126,8 +124,9 @@ public class Cart extends AppCompatActivity {
                 new DatabaseKK(getBaseContext()).cleanCart();
 
                 sendNotificationOrder(order_number);
-                Toast.makeText(Cart.this, "Thank you! Order Placed...", Toast.LENGTH_SHORT).show();
-                finish();
+
+//                Toast.makeText(Cart.this, "Thank you! Order Placed...", Toast.LENGTH_SHORT).show();
+//                finish();
             }
         });
         alertDialog.setNegativeButton("NO", new DialogInterface.OnClickListener() {
@@ -141,7 +140,7 @@ public class Cart extends AppCompatActivity {
 
     private void sendNotificationOrder(final String order_number) {
         DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("Tokens");
-        Query data = tokens.orderByChild("isServerToken").equalTo(true);
+        Query data = tokens.orderByChild("serverToken").equalTo(true);
 
         data.addValueEventListener(new ValueEventListener() {
             @Override
@@ -154,13 +153,12 @@ public class Cart extends AppCompatActivity {
                     Notification notification = new Notification("KK","You Have New Order "+order_number);
                     Sender content = new Sender(serverToken.getToken(),notification);
 
-                    mService.sendNotification(content)
-                            .enqueue(new Callback<MyResponse>() {
+                    mService.sendNotification(content).enqueue(new Callback<MyResponse>() {
                                 @Override
                                 public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
 
                                     //only run when when get result
-                                    if (response.code() == 200) {
+
                                         if (response.body().success == 1) {
                                             Toast.makeText(Cart.this, "Thank you! Order Placed...", Toast.LENGTH_SHORT).show();
                                             finish();
@@ -168,7 +166,6 @@ public class Cart extends AppCompatActivity {
                                         else {
                                             Toast.makeText(Cart.this, "Failed...!!!!!!!", Toast.LENGTH_SHORT).show();
                                         }
-                                    }
                                 }
 
                                 @Override
