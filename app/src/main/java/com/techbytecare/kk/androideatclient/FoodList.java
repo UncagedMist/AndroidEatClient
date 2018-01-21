@@ -36,6 +36,7 @@ import com.techbytecare.kk.androideatclient.Common.Common;
 import com.techbytecare.kk.androideatclient.Database.DatabaseKK;
 import com.techbytecare.kk.androideatclient.Interface.ItemClickListener;
 import com.techbytecare.kk.androideatclient.Model.Food;
+import com.techbytecare.kk.androideatclient.Model.Order;
 import com.techbytecare.kk.androideatclient.ViewHolder.FoodViewHolder;
 
 import java.util.ArrayList;
@@ -301,6 +302,22 @@ public class FoodList extends AppCompatActivity {
                 viewHolder.food_price.setText(String.format("$ %s",model.getPrice().toString()));
 
                 Picasso.with(getBaseContext()).load(model.getImage()).into(viewHolder.food_image);
+
+                //quick cart
+                viewHolder.quick_cart.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        new DatabaseKK(getBaseContext()).addToCart(new Order(
+                                adapter.getRef(position).getKey(),
+                                model.getName(),
+                                "1",
+                                model.getPrice(),
+                                model.getDiscount(),
+                                model.getImage()));
+
+                        Toast.makeText(FoodList.this, "Added To Cart", Toast.LENGTH_SHORT).show();
+                    }
+                });
 
                 //add favourites
                 if (localDB.isFavourites(adapter.getRef(position).getKey()))    {

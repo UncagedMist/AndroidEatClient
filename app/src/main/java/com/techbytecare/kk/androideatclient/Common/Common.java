@@ -6,6 +6,7 @@ import android.net.NetworkInfo;
 
 import com.techbytecare.kk.androideatclient.Model.User;
 import com.techbytecare.kk.androideatclient.Remote.APIService;
+import com.techbytecare.kk.androideatclient.Remote.IGoogleService;
 import com.techbytecare.kk.androideatclient.Remote.RetrofitClient;
 
 import retrofit2.Retrofit;
@@ -18,10 +19,18 @@ public class Common {
 
     public static User currentUser;
 
+    public static String PHONE_TEXT = "userPhone";
+
     private static final String BASE_URL = "https://fcm.googleapis.com/";
+
+    private static final String GOOGLE_API_URL = "https://maps.googleapis.com/";
 
     public static APIService getFCMService()    {
         return RetrofitClient.getClient(BASE_URL).create(APIService.class);
+    }
+
+    public static IGoogleService getGoogleMapAPI()    {
+        return RetrofitClient.getGoogleClient(GOOGLE_API_URL).create(IGoogleService.class);
     }
 
     public static final String DELETE = "Delete";

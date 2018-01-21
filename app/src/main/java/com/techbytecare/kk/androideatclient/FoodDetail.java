@@ -11,6 +11,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.andremion.counterfab.CounterFab;
 import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -37,9 +38,11 @@ public class FoodDetail extends AppCompatActivity implements RatingDialogListene
     TextView food_name,food_price,food_description;
     ImageView food_image;
     CollapsingToolbarLayout collapsingToolbarLayout;
-    FloatingActionButton btnCart,btnRating;
+    FloatingActionButton btnRating;
     ElegantNumberButton numberButton;
     RatingBar ratingBar;
+
+    CounterFab btnCart;
 
     String foodId = "";
 
@@ -68,7 +71,7 @@ public class FoodDetail extends AppCompatActivity implements RatingDialogListene
         ratingTbl = database.getReference("Rating");
 
         numberButton = (ElegantNumberButton)findViewById(R.id.number_button);
-        btnCart = (FloatingActionButton)findViewById(R.id.btnCart);
+        btnCart = (CounterFab) findViewById(R.id.btnCart);
         btnRating = (FloatingActionButton)findViewById(R.id.btn_rating);
         ratingBar = (RatingBar)findViewById(R.id.ratingBar);
 
@@ -87,11 +90,14 @@ public class FoodDetail extends AppCompatActivity implements RatingDialogListene
                         currentFood.getName(),
                         numberButton.getNumber(),
                         currentFood.getPrice(),
-                        currentFood.getDiscount()
-                ));
+                        currentFood.getDiscount(),
+                        currentFood.getImage()));
+
                 Toast.makeText(FoodDetail.this, "Added To Cart", Toast.LENGTH_SHORT).show();
             }
         });
+
+        btnCart.setCount(new DatabaseKK(this).getCountCart());
 
         food_description = (TextView)findViewById(R.id.food_description);
         food_price = (TextView)findViewById(R.id.food_price);

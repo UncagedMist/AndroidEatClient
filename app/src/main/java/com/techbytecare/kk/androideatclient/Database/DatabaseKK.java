@@ -30,7 +30,7 @@ public class DatabaseKK extends SQLiteAssetHelper   {
 
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 
-        String[] sqlSelect = {"ProductName","ProductId","Quantity","Price","Discount"};
+        String[] sqlSelect = {"ID","ProductName","ProductId","Quantity","Price","Discount","Image"};
 
         String sqlTable = "OrderDetail";
 
@@ -42,11 +42,14 @@ public class DatabaseKK extends SQLiteAssetHelper   {
 
         if (c.moveToFirst())    {
             do {
-                result.add(new Order(c.getString(c.getColumnIndex("ProductID")),
+                result.add(new Order(
+                        c.getInt(c.getColumnIndex("ID")),
+                        c.getString(c.getColumnIndex("ProductID")),
                         c.getString(c.getColumnIndex("ProductName")),
                         c.getString(c.getColumnIndex("Quantity")),
                         c.getString(c.getColumnIndex("Price")),
-                        c.getString(c.getColumnIndex("Discount"))));
+                        c.getString(c.getColumnIndex("Discount")),
+                        c.getString(c.getColumnIndex("Image"))));
             } while (c.moveToNext());
         } return result;
     }
@@ -54,13 +57,13 @@ public class DatabaseKK extends SQLiteAssetHelper   {
     public void addToCart(Order order) {
         final SQLiteDatabase db = getReadableDatabase();
 
-        String query = String.format("INSERT INTO OrderDetail(ProductId,ProductName,Quantity,Price,Discount)" +
-                        " VALUES('%s', '%s','%s','%s','%s')",
+        String query = String.format("INSERT INTO OrderDetail(ProductId,ProductName,Quantity,Price,Discount,Image) VALUES('%s', '%s','%s','%s','%s','%s');",
                 order.getProductId(),
                 order.getProductName(),
                 order.getQuantity(),
                 order.getPrice(),
-                order.getDiscount());
+                order.getDiscount(),
+                order.getImage());
 
         db.execSQL(query);
     }
@@ -98,5 +101,30 @@ public class DatabaseKK extends SQLiteAssetHelper   {
         }
         cursor.close();
         return true;
+    }
+
+    public int getCountCart() {
+
+        int count = 0;
+
+        SQLiteDatabase db = getReadableDatabase();
+        String query = String.format("SELECT COUNT(*) FROM OrderDetail");
+
+        Cursor cursor = db.rawQuery(query,null);
+
+        if (cursor.moveToFirst()) {
+
+            do {
+                count = cursor.getInt(0);
+            }while (cursor.moveToNext());
+
+        }
+        return count;
+    }
+
+    public void updateCart(Order order) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = String.format("UPDATE OrderDetail SET Quantity = %s WHERE ID = %d",order.getQuantity(),order.getID());
+        db.execSQL(query);
     }
 }

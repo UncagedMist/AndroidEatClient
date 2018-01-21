@@ -1,14 +1,17 @@
 package com.techbytecare.kk.androideatclient.ViewHolder;
 
+import android.media.Image;
 import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
 import com.techbytecare.kk.androideatclient.Common.Common;
 import com.techbytecare.kk.androideatclient.Interface.ItemClickListener;
 import com.techbytecare.kk.androideatclient.R;
+
 /**
  * Created by kundan on 12/17/2017.
  */
@@ -16,7 +19,8 @@ import com.techbytecare.kk.androideatclient.R;
 public class CartViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,View.OnCreateContextMenuListener    {
 
     public TextView txt_cart_name,txt_price;
-    public ImageView img_cart_count;
+    public ElegantNumberButton btn_quantity;
+    public ImageView cart_image;
 
     private ItemClickListener itemClickListener;
 
@@ -29,7 +33,8 @@ public class CartViewHolder extends RecyclerView.ViewHolder implements View.OnCl
 
         txt_cart_name = (TextView) itemView.findViewById(R.id.cart_item_name);
         txt_price = (TextView) itemView.findViewById(R.id.cart_item_price);
-        img_cart_count = (ImageView) itemView.findViewById(R.id.cart_item_count);
+        btn_quantity = (ElegantNumberButton) itemView.findViewById(R.id.btn_quantity);
+        cart_image = (ImageView)itemView.findViewById(R.id.cart_image);
 
         itemView.setOnClickListener(this);
         itemView.setOnCreateContextMenuListener(this);

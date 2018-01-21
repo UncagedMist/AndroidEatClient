@@ -11,6 +11,7 @@ public class User {
     private String phone;
     private String IsStaff;
     private String secureCode;
+    private String homeAddress;
 
     public User() {
     }
@@ -60,5 +61,13 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getHomeAddress() {
+        return homeAddress;
+    }
+
+    public void setHomeAddress(String homeAddress) {
+        this.homeAddress = homeAddress;
     }
 }
