@@ -23,15 +23,15 @@
             android:iconTint="@android:color/white"
             android:title="Orders Status"/>
         <item
-            android:id="@+id/nav_change_pwd"
-            android:icon="@drawable/ic_security_black_24dp"
+            android:id="@+id/nav_update_name"
+            android:icon="@drawable/ic_person_black_24dp"
             android:iconTint="@android:color/white"
-            android:title="Change Password"/>
+            android:title="Update Name"/>
         <item
             android:id="@+id/nav_log_out"
             android:icon="@drawable/ic_exit_to_app_black_24dp"
             android:iconTint="@android:color/white"
-            android:title="Exit"/>
+            android:title="Sign Out"/>
 
     </group>
 

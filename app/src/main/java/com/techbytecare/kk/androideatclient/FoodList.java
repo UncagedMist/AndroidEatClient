@@ -157,6 +157,60 @@ public class FoodList extends AppCompatActivity {
                         return;
                     }
                 }
+                //search
+                materialSearchBar = (MaterialSearchBar)findViewById(R.id.searchBar);
+                materialSearchBar.setHint("Enter the Food");
+
+                loadSuggest();
+
+                materialSearchBar.setCardViewElevation(10);
+
+                materialSearchBar.addTextChangeListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                        List<String> suggest = new ArrayList<String>();
+                        for (String search: suggestList){
+                            if(search.toLowerCase().contains(materialSearchBar.getText().toLowerCase())){
+                                suggest.add(search);
+                            }
+                        }
+                        materialSearchBar.setLastSuggestions(suggest);
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+
+                    }
+                });
+                materialSearchBar.setOnSearchActionListener(new MaterialSearchBar.OnSearchActionListener() {
+                    @Override
+                    public void onSearchStateChanged(boolean enabled) {
+                        // When Search Bar is close
+                        // Restore original suggest adapter
+                        if (!enabled){
+                            recyclerView.setAdapter(adapter);
+                        }
+                    }
+
+                    @Override
+                    public void onSearchConfirmed(CharSequence text) {
+                        // When Search finish
+                        // Show result of search adapter
+                        startSearch(text);
+
+                    }
+
+                    @Override
+                    public void onButtonClicked(int buttonCode) {
+
+                    }
+                });
             }
         });
 
@@ -166,66 +220,6 @@ public class FoodList extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-
-
-
-        //search
-        materialSearchBar = (MaterialSearchBar)findViewById(R.id.searchBar);
-        materialSearchBar.setHint("Enter the Food");
-        //materialSearchBar.setSpeechMode(false);
-
-        loadSuggest();
-
-        materialSearchBar.setLastSuggestions(suggestList);
-        materialSearchBar.setCardViewElevation(10);
-
-        materialSearchBar.addTextChangeListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                List<String> suggest = new ArrayList<String>();
-                for (String search: suggestList){
-                    if(search.toLowerCase().contains(materialSearchBar.getText().toLowerCase())){
-                        suggest.add(search);
-                    }
-                }
-                materialSearchBar.setLastSuggestions(suggest);
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
-        materialSearchBar.setOnSearchActionListener(new MaterialSearchBar.OnSearchActionListener() {
-            @Override
-            public void onSearchStateChanged(boolean enabled) {
-                // When Search Bar is close
-                // Restore original suggest adapter
-                if (!enabled){
-                    recyclerView.setAdapter(adapter);
-                }
-            }
-
-            @Override
-            public void onSearchConfirmed(CharSequence text) {
-                // When Search finish
-                // Show result of search adapter
-                startSearch(text);
-
-            }
-
-            @Override
-            public void onButtonClicked(int buttonCode) {
-
-            }
-        });
-
 
     }
 
@@ -260,9 +254,9 @@ public class FoodList extends AppCompatActivity {
 
             @Override
             public FoodViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                View itemViw = LayoutInflater.from(parent.getContext()).inflate(R.layout.food_item,parent,false);
+                View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.food_item,parent,false);
 
-                return new FoodViewHolder(itemViw);
+                return new FoodViewHolder(itemView);
             }
         };
         searchAdapter.startListening();
@@ -279,6 +273,7 @@ public class FoodList extends AppCompatActivity {
                             Food item = postSnapshot.getValue(Food.class);
                             suggestList.add(item.getName());
                         }
+                        materialSearchBar.setLastSuggestions(suggestList);
                     }
 
                     @Override
@@ -376,6 +371,14 @@ public class FoodList extends AppCompatActivity {
         adapter.notifyDataSetChanged();
         recyclerView.setAdapter(adapter);
         swipeRefreshLayout.setRefreshing(false);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (adapter != null) {
+            adapter.startListening();
+        }
     }
 
     @Override

@@ -24,6 +24,7 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -286,7 +287,7 @@ public class Cart extends AppCompatActivity implements GoogleApiClient.Connectio
 
                                 address = firstObject.getString("formatted_address");
                                 //set this address to edtAddress
-                                ((EditText)edtAddress.getView().findViewById(R.id.place_autocomplete_search_input)).setText(address);
+                                //((EditText)edtAddress.getView().findViewById(R.id.place_autocomplete_search_input)).setText(address);
 
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -346,35 +347,33 @@ public class Cart extends AppCompatActivity implements GoogleApiClient.Connectio
                     }
                 }
 
-                if (!TextUtils.isEmpty(address))    {
+                if (!TextUtils.isEmpty(address)) {
 
-                    Toast.makeText(Cart.this, "Please Enter Address Or Select Option Address!!!", Toast.LENGTH_SHORT).show();
-
+                    Toast.makeText(Cart.this, "Order Placed", Toast.LENGTH_SHORT).show();
                     //fix crash fragment
                     getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment)).commit();
 
                     return;
                 }
 
-                comment = edtComment.getText().toString();
+                    comment = edtComment.getText().toString();
 
-                String formatAmount = txtTotalPrice.getText().toString()
-                        .replace("$","")
-                        .replace(",","");
+                    String formatAmount = txtTotalPrice.getText().toString()
+                            .replace("$", "")
+                            .replace(",", "");
 
 
-                PayPalPayment payPalPayment = new PayPalPayment(new BigDecimal(formatAmount),
-                        "USD",
-                        "Eat It App Order",
-                        PayPalPayment.PAYMENT_INTENT_SALE);
+                    PayPalPayment payPalPayment = new PayPalPayment(new BigDecimal(formatAmount),
+                            "USD",
+                            "Eat It App Order",
+                            PayPalPayment.PAYMENT_INTENT_SALE);
 
-                Intent intent = new Intent(getApplicationContext(), PaymentActivity.class);
-                intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION,config);
-                intent.putExtra(PaymentActivity.EXTRA_PAYMENT,payPalPayment);
-                startActivityForResult(intent,PAYPAL_REQUEST_CODE);
+                    Intent intent = new Intent(getApplicationContext(), PaymentActivity.class);
+                    intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
+                    intent.putExtra(PaymentActivity.EXTRA_PAYMENT, payPalPayment);
+                    startActivityForResult(intent, PAYPAL_REQUEST_CODE);
 
-                getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment)).commit();
-
+                    getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment)).commit();
 
             }
         });

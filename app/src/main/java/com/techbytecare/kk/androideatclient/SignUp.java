@@ -25,18 +25,10 @@ public class SignUp extends AppCompatActivity {
     MaterialEditText edtName,edtPhone,edtPassword,edtSecureCode;
     Button btnSignUp;
 
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder().setDefaultFontPath("fonts/restaurant_font.otf")
-                .setFontAttrId(R.attr.fontPath).build());
-
         setContentView(R.layout.activity_sign_up);
 
         edtName = (MaterialEditText)findViewById(R.id.edtName);
@@ -59,7 +51,7 @@ public class SignUp extends AppCompatActivity {
                     //add progressBar
                     final ProgressDialog mDialog = new ProgressDialog(SignUp.this);
                     mDialog.setTitle("USER SIGN-UP");
-                    mDialog.setMessage("Please wait! while we check your credential!!");
+                    mDialog.setMessage("Please wait! while we Register Your Account!!");
                     mDialog.setCanceledOnTouchOutside(false);
                     mDialog.show();
 
@@ -70,8 +62,9 @@ public class SignUp extends AppCompatActivity {
                             //check if user already exists
                             if (dataSnapshot.child(edtPhone.getText().toString()).exists()) {
                                 mDialog.dismiss();
-                                Toast.makeText(SignUp.this, "Already Registered..", Toast.LENGTH_SHORT).show();
-                            } else {
+                                Toast.makeText(SignUp.this, "Already Registered!!!", Toast.LENGTH_SHORT).show();
+                            }
+                            else {
                                 mDialog.dismiss();
                                 User user = new User(edtName.getText().toString(), edtPassword.getText().toString(),
                                         edtSecureCode.getText().toString());

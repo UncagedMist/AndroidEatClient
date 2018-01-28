@@ -8,8 +8,9 @@
     tools:context="com.techbytecare.kk.androideatclient.MainActivity">
 
     <LinearLayout
+        android:layout_marginTop="50dp"
+        android:id="@+id/imageSlogan"
         android:orientation="vertical"
-        android:layout_centerInParent="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center">
@@ -31,8 +32,9 @@
     </LinearLayout>
 
     <LinearLayout
+        android:layout_above="@+id/extraLogin"
         android:orientation="horizontal"
-        android:layout_alignParentBottom="true"
+        android:layout_centerVertical="true"
         android:weightSum="2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -42,7 +44,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/sign_up"
+            android:text="SIGN UP"
             android:textColor="@android:color/white"
             android:layout_margin="8dp"
             app:fButtonColor="@color/btnSignUp"
@@ -56,7 +58,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/sign_in"
+            android:text="SIGN IN"
             android:textColor="@android:color/white"
             android:layout_margin="8dp"
             app:fButtonColor="@color/btnSignActive"
@@ -65,5 +67,39 @@
             app:shadowHeight="5dp"
             app:cornerRadius="4dp" />
 
+
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/extraLogin"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:id="@+id/btn_continue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_circle"
+            android:padding="8dp"
+            android:src="@drawable/ic_phone"
+            android:tint="@android:color/white"
+            android:layout_margin="5dp"/>
+
+        <ImageButton
+            android:id="@+id/btn_google"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_circle"
+            android:padding="8dp"
+            android:src="@drawable/ic_google"
+            android:tint="@android:color/white"
+            android:layout_margin="5dp"/>
+
+    </LinearLayout>
+
+
 </RelativeLayout>

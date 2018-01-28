@@ -40,17 +40,8 @@ public class SignIn extends AppCompatActivity {
     DatabaseReference table_user;
 
     @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder().setDefaultFontPath("fonts/restaurant_font.otf")
-                .setFontAttrId(R.attr.fontPath).build());
-
         setContentView(R.layout.activity_sign_in);
 
         edtPhone = (MaterialEditText)findViewById(R.id.edtPhone);
@@ -167,7 +158,7 @@ public class SignIn extends AppCompatActivity {
         final MaterialEditText edtPhone = (MaterialEditText)forgot_view.findViewById(R.id.edtPhone);
         final MaterialEditText edtSecureCode = (MaterialEditText)forgot_view.findViewById(R.id.txtSecureCode);
 
-        builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("SHOW", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
@@ -193,10 +184,10 @@ public class SignIn extends AppCompatActivity {
             }
         });
 
-        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
+                dialog.dismiss();
             }
         });
 

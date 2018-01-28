@@ -1,6 +1,8 @@
 package com.techbytecare.kk.androideatclient;
 
 import android.content.Context;
+import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +15,8 @@ import android.widget.Toast;
 
 import com.andremion.counterfab.CounterFab;
 import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -30,6 +34,7 @@ import com.techbytecare.kk.androideatclient.Model.Rating;
 
 import java.util.Arrays;
 
+import info.hoang8f.widget.FButton;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -52,6 +57,8 @@ public class FoodDetail extends AppCompatActivity implements RatingDialogListene
 
     Food currentFood;
 
+    FButton btnShowComment;
+
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
@@ -70,10 +77,21 @@ public class FoodDetail extends AppCompatActivity implements RatingDialogListene
         foods = database.getReference("Foods");
         ratingTbl = database.getReference("Rating");
 
+        btnShowComment = (FButton)findViewById(R.id.btnShowComment);
+
         numberButton = (ElegantNumberButton)findViewById(R.id.number_button);
         btnCart = (CounterFab) findViewById(R.id.btnCart);
         btnRating = (FloatingActionButton)findViewById(R.id.btn_rating);
         ratingBar = (RatingBar)findViewById(R.id.ratingBar);
+
+        btnShowComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent commentIntent = new Intent(FoodDetail.this,ShowComment.class);
+                commentIntent.putExtra(Common.INTENT_FOOD_ID,foodId);
+                startActivity(commentIntent);
+            }
+        });
 
         btnRating.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -202,6 +220,9 @@ public class FoodDetail extends AppCompatActivity implements RatingDialogListene
                 foodId,
                 String.valueOf(value),comments);
 
+        /*
+        //user can rate only 1 time
+
         ratingTbl.child(Common.currentUser.getPhone()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -222,6 +243,16 @@ public class FoodDetail extends AppCompatActivity implements RatingDialogListene
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
+            }
+        });
+        */
+
+        //fix user can rate multiple times
+        ratingTbl.push()
+                .setValue(rating).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                Toast.makeText(FoodDetail.this, "Thank You For Your FeedBack !!!", Toast.LENGTH_SHORT).show();
             }
         });
     }

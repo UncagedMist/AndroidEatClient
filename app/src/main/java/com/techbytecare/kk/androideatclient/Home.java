@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
@@ -27,19 +26,29 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.andremion.counterfab.CounterFab;
+import com.daimajia.slider.library.Animations.DescriptionAnimation;
+import com.daimajia.slider.library.SliderLayout;
+import com.daimajia.slider.library.SliderTypes.BaseSliderView;
+import com.daimajia.slider.library.SliderTypes.TextSliderView;
+import com.facebook.accountkit.AccountKit;
+import com.facebook.login.LoginManager;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.squareup.picasso.Picasso;
 import com.techbytecare.kk.androideatclient.Common.Common;
 import com.techbytecare.kk.androideatclient.Database.DatabaseKK;
 import com.techbytecare.kk.androideatclient.Interface.ItemClickListener;
+import com.techbytecare.kk.androideatclient.Model.Banner;
 import com.techbytecare.kk.androideatclient.Model.Category;
 import com.techbytecare.kk.androideatclient.Model.Token;
 import com.techbytecare.kk.androideatclient.ViewHolder.MenuViewHolder;
@@ -61,13 +70,16 @@ public class Home extends AppCompatActivity
     TextView txtFullName;
 
     RecyclerView recycler_menu;
-    RecyclerView.LayoutManager layoutManager;
+    //RecyclerView.LayoutManager layoutManager;
 
     FirebaseRecyclerAdapter<Category,MenuViewHolder> adapter;
 
     SwipeRefreshLayout swipeRefreshLayout;
 
     CounterFab fab;
+
+    HashMap<String,String> image_list;
+    SliderLayout mSlider;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -86,6 +98,8 @@ public class Home extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Menu");
         setSupportActionBar(toolbar);
+
+        Paper.init(this);
 
         //view
         swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipe_layout);
@@ -158,7 +172,7 @@ public class Home extends AppCompatActivity
             }
         };
 
-        Paper.init(this);
+        //Paper.init(this);
 
         fab = (CounterFab) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -197,6 +211,68 @@ public class Home extends AppCompatActivity
         recycler_menu.setLayoutAnimation(controller);
 
         updateToken(FirebaseInstanceId.getInstance().getToken());
+
+        //set slider
+        setupSlider();
+    }
+
+    private void setupSlider() {
+        mSlider = (SliderLayout)findViewById(R.id.slider);
+        image_list = new HashMap<>();
+
+        final DatabaseReference banners = database.getReference("Banner");
+
+        banners.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren())  {
+                    Banner banner = postSnapshot.getValue(Banner.class);
+
+                    image_list.put(banner.getName()+"@@@"+banner.getId(),banner.getImage());
+                }
+
+                for (String key : image_list.keySet())  {
+
+                    String[] keySplit = key.split("@@@");
+                    String nameOfFood = keySplit[0];
+                    String idOfFood = keySplit[1];
+
+                    //create slider
+                    final TextSliderView textSliderView = new TextSliderView(getBaseContext());
+
+                    textSliderView.description(nameOfFood)
+                            .image(image_list.get(key))
+                            .setScaleType(BaseSliderView.ScaleType.Fit)
+                            .setOnSliderClickListener(new BaseSliderView.OnSliderClickListener() {
+                                @Override
+                                public void onSliderClick(BaseSliderView slider) {
+                                    Intent intent = new Intent(Home.this,FoodDetail.class);
+                                    intent.putExtras(textSliderView.getBundle());
+                                    startActivity(intent);
+                                }
+                            });
+                    //add extra bundle
+                    textSliderView.bundle(new Bundle());
+                    textSliderView.getBundle().putString("FoodId",idOfFood);
+
+                    mSlider.addSlider(textSliderView);
+
+                    //remove after finishing
+                    banners.removeEventListener(this);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        mSlider.setPresetTransformer(SliderLayout.Transformer.Background2Foreground);
+        mSlider.setPresetIndicator(SliderLayout.PresetIndicators.Center_Bottom);
+        mSlider.setCustomAnimation(new DescriptionAnimation());
+        mSlider.setDuration(4000);
     }
 
     @Override
@@ -228,10 +304,13 @@ public class Home extends AppCompatActivity
         recycler_menu.scheduleLayoutAnimation();
     }
 
+
+
     @Override
     protected void onStop() {
         super.onStop();
         adapter.stopListening();
+        mSlider.stopAutoCycle();
     }
 
     @Override
@@ -283,15 +362,16 @@ public class Home extends AppCompatActivity
             Intent orderStatusIntent = new Intent(Home.this,OrderStatus.class);
             startActivity(orderStatusIntent);
         }
-        else if (id == R.id.nav_change_pwd)  {
-            showChangePasswordDialog();
+        else if (id == R.id.nav_update_name)  {
+            showUpdateNameDialog();
         }
         else if (id == R.id.nav_log_out) {
             //delete remember user and password
             Paper.book().destroy();
 
+
             //logout
-            Intent signOutIntent = new Intent(Home.this,SignIn.class);
+            Intent signOutIntent = new Intent(Home.this,MainActivity.class);
             signOutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(signOutIntent);
         }
@@ -332,21 +412,19 @@ public class Home extends AppCompatActivity
         alertDialog.show();
     }
 
-    private void showChangePasswordDialog() {
+    private void showUpdateNameDialog() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(Home.this);
-        alertDialog.setTitle("Change Password");
+        alertDialog.setTitle("UPDATE NAME");
         alertDialog.setMessage("Please Fill all information..");
 
         LayoutInflater inflater = LayoutInflater.from(this);
-        View layout_pwd = inflater.inflate(R.layout.change_password_layout,null);
+        View layout_update_name = inflater.inflate(R.layout.update_name_layout,null);
 
-        final MaterialEditText edtPassword = (MaterialEditText)layout_pwd.findViewById(R.id.edtPassword);
-        final MaterialEditText edtNewPassword = (MaterialEditText)layout_pwd.findViewById(R.id.edtNewPassword);
-        final MaterialEditText edtRepeatPassword = (MaterialEditText)layout_pwd.findViewById(R.id.edtRepeatPassword);
+        final MaterialEditText edtName = (MaterialEditText)layout_update_name.findViewById(R.id.edtName);
 
-        alertDialog.setView(layout_pwd);
+        alertDialog.setView(layout_update_name);
         //Button
-        alertDialog.setPositiveButton("CHANGE", new DialogInterface.OnClickListener() {
+        alertDialog.setPositiveButton("UPDATE", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int which) {
                 //change password here
@@ -354,38 +432,24 @@ public class Home extends AppCompatActivity
                 final android.app.AlertDialog waitingDialog = new SpotsDialog(Home.this);
                 waitingDialog.show();
 
-                //check old password
-                if (edtPassword.getText().toString().equals(Common.currentUser.getPassword()))  {
-                    //check new password and repeated password
-                    if (edtNewPassword.getText().toString().equals(edtRepeatPassword.getText().toString()))     {
-                        Map<String,Object> passwordUpdate = new HashMap<>();
-                        passwordUpdate.put("password",edtNewPassword.getText().toString());
+                //update name
+                Map<String,Object> update_name = new HashMap<>();
+                update_name.put("name",edtName.getText().toString());
 
-                        //make update
-                        DatabaseReference user = FirebaseDatabase.getInstance().getReference("User");
-                        user.child(Common.currentUser.getPhone()).updateChildren(
-                                passwordUpdate).addOnCompleteListener(new OnCompleteListener<Void>() {
+                FirebaseDatabase.getInstance().getReference("User")
+                        .child(Common.currentUser.getPhone())
+                        .updateChildren(update_name)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
+
                                 waitingDialog.dismiss();
-                                Toast.makeText(Home.this, "Password Successfully Updated!!!!", Toast.LENGTH_SHORT).show();
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(Home.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                if (task.isSuccessful())    {
+
+                                    Toast.makeText(Home.this, "Name Was Updated!!!", Toast.LENGTH_SHORT).show();
+                                }
                             }
                         });
-                    }
-                    else    {
-                        waitingDialog.dismiss();
-                        Toast.makeText(Home.this, "New And Repeated Password Doesn't Match..", Toast.LENGTH_SHORT).show();
-                    }
-                }
-                else    {
-                    waitingDialog.dismiss();
-                    Toast.makeText(Home.this, "Wrong Old Password..", Toast.LENGTH_SHORT).show();
-                }
             }
         });
         alertDialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {

@@ -90,14 +90,22 @@ public class OrderStatus extends AppCompatActivity {
             @Override
             public OrderViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-                View itemViw = LayoutInflater.from(parent.getContext()).inflate(R.layout.order_layout,parent,false);
+                View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.order_layout,parent,false);
 
-                return new OrderViewHolder(itemViw);
+                return new OrderViewHolder(itemView);
             }
         };
         adapter.startListening();
         adapter.notifyDataSetChanged();
         recyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (adapter != null)    {
+            adapter.startListening();
+        }
     }
 
     @Override
