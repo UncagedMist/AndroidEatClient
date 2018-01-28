@@ -323,7 +323,7 @@ public class Cart extends AppCompatActivity implements GoogleApiClient.Connectio
         alertDialog.setView(order_address_comment);
         alertDialog.setIcon(R.drawable.ic_shopping_cart_black_24dp);
 
-        alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+        alertDialog.setPositiveButton("PAY NOW", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int which) {
 
@@ -377,7 +377,7 @@ public class Cart extends AppCompatActivity implements GoogleApiClient.Connectio
 
             }
         });
-        alertDialog.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+        alertDialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int which) {
                 dialogInterface.dismiss();
@@ -514,7 +514,9 @@ public class Cart extends AppCompatActivity implements GoogleApiClient.Connectio
         //calculate total price
         int total = 0;
         for (Order order : cart)    {
-            total += (Integer.parseInt(order.getPrice())) * (Integer.parseInt(order.getQuantity()));
+            //total += (Integer.parseInt(order.getPrice())) * (Integer.parseInt(order.getQuantity()));
+            total += ((Integer.parseInt(order.getPrice())) * (Integer.parseInt(order.getQuantity())))
+                    - ((Integer.parseInt(order.getDiscount())) * (Integer.parseInt(order.getQuantity())));
 
             Locale locale = new Locale("en","US");
             NumberFormat fmt = NumberFormat.getCurrencyInstance(locale);

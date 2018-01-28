@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -48,40 +49,62 @@ public class SignUp extends AppCompatActivity {
 
                 if (Common.isConnectedToInternet(getBaseContext())) {
 
-                    //add progressBar
-                    final ProgressDialog mDialog = new ProgressDialog(SignUp.this);
-                    mDialog.setTitle("USER SIGN-UP");
-                    mDialog.setMessage("Please wait! while we Register Your Account!!");
-                    mDialog.setCanceledOnTouchOutside(false);
-                    mDialog.show();
+                    if (TextUtils.isEmpty(edtPhone.getText().toString())) {
+                        Toast.makeText(SignUp.this, "Please Enter Your Phone!!!", Toast.LENGTH_SHORT).show();
+                    }
+                    else if (TextUtils.isEmpty(edtName.getText().toString())) {
+                        Toast.makeText(SignUp.this, "Please Enter Your Name!!!", Toast.LENGTH_SHORT).show();
+                    }
+                    else if (TextUtils.isEmpty(edtPassword.getText().toString())) {
+                        Toast.makeText(SignUp.this, "Please Enter Your Password!!!", Toast.LENGTH_SHORT).show();
+                    }
+                    else if (TextUtils.isEmpty(edtSecureCode.getText().toString())) {
+                        Toast.makeText(SignUp.this, "Please Enter Your Secure-Code!!!", Toast.LENGTH_SHORT).show();
+                    }
+                    else if (edtPassword.getText().toString().length() < 8) {
+                        Toast.makeText(SignUp.this, "Password Too Small!!! Min 8 Chars...", Toast.LENGTH_SHORT).show();
+                    }
+                    else if (edtSecureCode.getText().toString().length() < 6) {
+                        Toast.makeText(SignUp.this, "Secure-Code Too Small!!! Min 6 Chars...", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
 
-                    table_user.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
+                        //add progressBar
+                        final ProgressDialog mDialog = new ProgressDialog(SignUp.this);
+                        mDialog.setTitle("USER SIGN-UP");
+                        mDialog.setMessage("Please wait! while we Register Your Account!!");
+                        mDialog.setCanceledOnTouchOutside(false);
+                        mDialog.show();
 
-                            //check if user already exists
-                            if (dataSnapshot.child(edtPhone.getText().toString()).exists()) {
-                                mDialog.dismiss();
-                                Toast.makeText(SignUp.this, "Already Registered!!!", Toast.LENGTH_SHORT).show();
+                        table_user.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                //check if user already exists
+                                if (dataSnapshot.child(edtPhone.getText().toString()).exists()) {
+                                    mDialog.dismiss();
+                                    Toast.makeText(SignUp.this, "Already Registered!!!", Toast.LENGTH_SHORT).show();
+                                    finish();
+                                }
+                                else {
+                                    mDialog.dismiss();
+                                    User user = new User(edtName.getText().toString(), edtPassword.getText().toString(),
+                                            edtSecureCode.getText().toString());
+
+                                    table_user.child(edtPhone.getText().toString()).setValue(user);
+
+                                    Toast.makeText(SignUp.this, "You are good to Go..", Toast.LENGTH_SHORT).show();
+                                }
                             }
-                            else {
-                                mDialog.dismiss();
-                                User user = new User(edtName.getText().toString(), edtPassword.getText().toString(),
-                                        edtSecureCode.getText().toString());
 
-                                table_user.child(edtPhone.getText().toString()).setValue(user);
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
 
-                                Toast.makeText(SignUp.this, "You are good to Go..", Toast.LENGTH_SHORT).show();
-                                finish();
                             }
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
+                        });
+                    }
                 }
+
                 else {
                     Toast.makeText(SignUp.this, "Please Check Your Internet Connection", Toast.LENGTH_SHORT).show();
                     return;

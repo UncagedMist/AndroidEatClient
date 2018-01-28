@@ -2,6 +2,7 @@ package com.techbytecare.kk.androideatclient;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Paint;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -40,7 +41,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class FoodDetail extends AppCompatActivity implements RatingDialogListener{
 
-    TextView food_name,food_price,food_description;
+    TextView food_name,food_price,food_description,food_discount_price;
     ImageView food_image;
     CollapsingToolbarLayout collapsingToolbarLayout;
     FloatingActionButton btnRating;
@@ -121,6 +122,7 @@ public class FoodDetail extends AppCompatActivity implements RatingDialogListene
         food_price = (TextView)findViewById(R.id.food_price);
         food_name = (TextView)findViewById(R.id.food_name);
         food_image = (ImageView)findViewById(R.id.img_food);
+        food_discount_price = (TextView)findViewById(R.id.food_discount_price);
 
         collapsingToolbarLayout = (CollapsingToolbarLayout)findViewById(R.id.collapsing);
 
@@ -178,7 +180,7 @@ public class FoodDetail extends AppCompatActivity implements RatingDialogListene
                 .setNoteDescriptions(Arrays.asList("Very Bad","Not Good","Quite OK","Very Good","Awesome Taste"))
                 .setDefaultRating(1)
                 .setTitle("Rate this Food")
-                .setDescription("Please Select some Stars ans Give Your FeedBack")
+                .setDescription("Please Select Some Stars and Give Your FeedBack")
                 .setTitleTextColor(R.color.colorPrimary)
                 .setDescriptionTextColor(R.color.colorPrimary)
                 .setHint("Please Write Your FeedBack Here")
@@ -202,9 +204,20 @@ public class FoodDetail extends AppCompatActivity implements RatingDialogListene
 
                 collapsingToolbarLayout.setTitle(currentFood.getName());
 
+                //int price = (Integer.parseInt(currentFood.getPrice()) - (Integer.parseInt(currentFood.getDiscount())));
+
                 food_price.setText(currentFood.getPrice());
+                //food_price.setPaintFlags(food_price.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+
                 food_name.setText(currentFood.getName());
                 food_description.setText(currentFood.getDescription());
+
+                if (!currentFood.getDiscount().equals("0"))   {
+                    food_discount_price.setText("Discount : $"+" "+currentFood.getDiscount());
+                }
+                else    {
+                    food_discount_price.setVisibility(View.GONE);
+                }
             }
 
             @Override

@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -64,6 +65,7 @@ public class SignIn extends AppCompatActivity {
             }
         });
 
+
         btnSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -71,74 +73,86 @@ public class SignIn extends AppCompatActivity {
                 if (Common.isConnectedToInternet(getBaseContext())) {
 
                     //save user and password
-                    if (ckbRemember.isChecked())    {
-                        Paper.book().write(Common.USER_KEY,edtPhone.getText().toString());
-                        Paper.book().write(Common.PWD_KEY,edtPassword.getText().toString());
+                    if (ckbRemember.isChecked()) {
+                        Paper.book().write(Common.USER_KEY, edtPhone.getText().toString());
+                        Paper.book().write(Common.PWD_KEY, edtPassword.getText().toString());
                     }
 
-                    //add progressBar
-                    final ProgressDialog mDialog = new ProgressDialog(SignIn.this);
-                    mDialog.setTitle("USER LOG-IN");
-                    mDialog.setMessage("Please wait! while we check your credential!!");
-                    mDialog.setCanceledOnTouchOutside(false);
-                    mDialog.show();
+                    if (TextUtils.isEmpty(edtPhone.getText().toString())) {
+                        Toast.makeText(SignIn.this, "Please Enter Your Phone!!!", Toast.LENGTH_SHORT).show();
+                    }
+                    else if (TextUtils.isEmpty(edtPassword.getText().toString())) {
+                        Toast.makeText(SignIn.this, "Please Enter Your Password!!!", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        //add progressBar
+                        final ProgressDialog mDialog = new ProgressDialog(SignIn.this);
+                        mDialog.setTitle("USER LOG-IN");
+                        mDialog.setMessage("Please wait! while we check your credential!!");
+                        mDialog.setCanceledOnTouchOutside(false);
+                        mDialog.show();
 
-                    table_user.addListenerForSingleValueEvent(new ValueEventListener() {
+                        table_user.addListenerForSingleValueEvent(new ValueEventListener() {
 
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                            table_user.addValueEventListener(new ValueEventListener() {
+                                table_user.addValueEventListener(new ValueEventListener() {
 
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                    //check if user doesn't exist in database
-                                    if (dataSnapshot.child(edtPhone.getText().toString()).exists()) {
+                                        //check if user doesn't exist in database
+                                        if (dataSnapshot.child(edtPhone.getText().toString()).exists()) {
 
-                                        //get user information
-                                        mDialog.dismiss();
-                                        User user = dataSnapshot.child(edtPhone.getText().toString()).getValue(User.class);
-                                        user.setPhone(edtPhone.getText().toString());//set phone
-
-                                        if (user.getPassword().equals(edtPassword.getText().toString())) {
+                                            //get user information
                                             mDialog.dismiss();
-                                            Toast.makeText(SignIn.this, "Welcome! Sign In Successful!!", Toast.LENGTH_SHORT).show();
+                                            User user = dataSnapshot.child(edtPhone.getText().toString()).getValue(User.class);
+                                            user.setPhone(edtPhone.getText().toString());//set phone
 
-                                            Intent homeIntent = new Intent(SignIn.this, Home.class);
-                                            Common.currentUser = user;
-                                            startActivity(homeIntent);
-                                            finish();
+                                            if (user.getPassword().equals(edtPassword.getText().toString())) {
 
-                                            table_user.removeEventListener(this);
+                                                mDialog.dismiss();
+                                                Toast.makeText(SignIn.this, "Welcome! Sign In Successful!!", Toast.LENGTH_SHORT).show();
+
+                                                Intent homeIntent = new Intent(SignIn.this, Home.class);
+                                                Common.currentUser = user;
+                                                startActivity(homeIntent);
+                                                finish();
+
+                                                table_user.removeEventListener(this);
+                                            }
+                                            else {
+                                                mDialog.dismiss();
+                                                Toast.makeText(SignIn.this, "Wrong Password!!!", Toast.LENGTH_SHORT).show();
+                                            }
                                         }
                                         else {
                                             mDialog.dismiss();
-                                            Toast.makeText(SignIn.this, "Wrong Password!!!", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(SignIn.this, "Not Registered Yet! Kindly Register", Toast.LENGTH_SHORT).show();
                                         }
-                                    } else {
-                                        mDialog.dismiss();
-                                        Toast.makeText(SignIn.this, "Not Registered Yet! Kindly Register", Toast.LENGTH_SHORT).show();
                                     }
-                                }
 
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
 
-                                }
-                            });
-                        }
+                                    }
+                                });
+                            }
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
 
-                        }
-                    });
+                            }
+                        });
+                    }
                 }
-                else    {
-                    Toast.makeText(SignIn.this, "Please Check Your Internet Connection", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+
+                else{
+                        Toast.makeText(SignIn.this, "Please Check Your Internet Connection", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
             }
         });
     }

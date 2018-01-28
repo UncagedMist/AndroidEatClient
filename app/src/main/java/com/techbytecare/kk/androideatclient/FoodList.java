@@ -242,7 +242,7 @@ public class FoodList extends AppCompatActivity {
                 viewHolder.setItemClickListener(new ItemClickListener() {
                     @Override
                     public void onClick(View view, int position, boolean isLongClick) {
-                        Toast.makeText(FoodList.this, "" + model.getName(), Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(FoodList.this, "" + model.getName(), Toast.LENGTH_SHORT).show();
                         // start Food detail activity
                         Intent intentFoodDetail = new Intent(FoodList.this, FoodDetail.class);
                         intentFoodDetail.putExtra("FoodId", searchAdapter.getRef(position).getKey());
@@ -349,7 +349,7 @@ public class FoodList extends AppCompatActivity {
                 viewHolder.setItemClickListener(new ItemClickListener() {
                     @Override
                     public void onClick(View view, int position, boolean isLongClick) {
-                        Toast.makeText(FoodList.this, ""+local.getName(), Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(FoodList.this, ""+local.getName(), Toast.LENGTH_SHORT).show();
 
                         //start the activity
                         Intent foodDetail = new Intent(FoodList.this,FoodDetail.class);

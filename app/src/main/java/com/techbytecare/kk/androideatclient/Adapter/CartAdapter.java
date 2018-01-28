@@ -63,7 +63,11 @@ public class CartAdapter extends RecyclerView.Adapter<CartViewHolder> {
                 List<Order> orders = new DatabaseKK(cart).getCarts();
 
                 for (Order item : orders)    {
-                    total += (Integer.parseInt(order.getPrice())) * (Integer.parseInt(item.getQuantity()));
+                    //total += (Integer.parseInt(order.getPrice())) * (Integer.parseInt(item.getQuantity()));
+
+                    total += ((Integer.parseInt(order.getPrice())) * (Integer.parseInt(order.getQuantity())))
+                            - ((Integer.parseInt(order.getDiscount())) * (Integer.parseInt(order.getQuantity())));
+
 
                     Locale locale = new Locale("en","US");
                     NumberFormat fmt = NumberFormat.getCurrencyInstance(locale);
@@ -75,7 +79,10 @@ public class CartAdapter extends RecyclerView.Adapter<CartViewHolder> {
 
             Locale locale = new Locale("en","US");
             NumberFormat fmt = NumberFormat.getCurrencyInstance(locale);
-            int price = (Integer.parseInt(listData.get(position).getPrice()))*(Integer.parseInt(listData.get(position).getQuantity()));
+            //int price = (Integer.parseInt(listData.get(position).getPrice()))*(Integer.parseInt(listData.get(position).getQuantity()));
+            int price = ((Integer.parseInt(listData.get(position).getPrice()))*(Integer.parseInt(listData.get(position).getQuantity())))
+                    - ((Integer.parseInt(listData.get(position).getDiscount())) * (Integer.parseInt(listData.get(position).getQuantity())));
+
             holder.txt_price.setText(fmt.format(price));
             holder.txt_cart_name.setText(listData.get(position).getProductName());
     }
