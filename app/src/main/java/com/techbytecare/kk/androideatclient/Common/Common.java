@@ -6,8 +6,15 @@ import android.net.NetworkInfo;
 
 import com.techbytecare.kk.androideatclient.Model.User;
 import com.techbytecare.kk.androideatclient.Remote.APIService;
+import com.techbytecare.kk.androideatclient.Remote.GoogleRetrofitClient;
 import com.techbytecare.kk.androideatclient.Remote.IGoogleService;
 import com.techbytecare.kk.androideatclient.Remote.RetrofitClient;
+
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.Locale;
 
 import retrofit2.Retrofit;
 
@@ -16,6 +23,8 @@ import retrofit2.Retrofit;
  */
 
 public class Common {
+
+    public static String topicName = "News";
 
     public static User currentUser;
 
@@ -32,7 +41,7 @@ public class Common {
     }
 
     public static IGoogleService getGoogleMapAPI()    {
-        return RetrofitClient.getGoogleClient(GOOGLE_API_URL).create(IGoogleService.class);
+        return GoogleRetrofitClient.getGoogleClient(GOOGLE_API_URL).create(IGoogleService.class);
     }
 
     public static final String DELETE = "Delete";
@@ -69,6 +78,16 @@ public class Common {
             }
         }
         return false;
+    }
+
+    public static BigDecimal formatCurrency(String amount, Locale locale) throws ParseException  {
+
+        NumberFormat format = NumberFormat.getCurrencyInstance(locale);
+
+        if (format instanceof DecimalFormat)    {
+            ((DecimalFormat)format).setParseBigDecimal(true);
+        }
+        return (BigDecimal)format.parse(amount.replace("[^\\d.,]",""));
     }
 
 }

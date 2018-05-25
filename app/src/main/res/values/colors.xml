@@ -12,4 +12,6 @@
 
     <color name="overlayBackgroundMenu">#7f004487</color>
     <color name="overlayBackgroundFood">#7f008716</color>
+    
+    <color name="bgRowBackground">#FA315B</color>
 </resources>

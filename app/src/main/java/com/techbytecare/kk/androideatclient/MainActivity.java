@@ -305,6 +305,7 @@ public class MainActivity extends AppCompatActivity {
                                                 newUser.setPhone(userPhone);
 
                                                 newUser.setName("");
+                                                newUser.setBalance(String.valueOf(0.0));
 
                                                 //add to firebase
                                                 users.child(userPhone).setValue(newUser).addOnCompleteListener(new OnCompleteListener<Void>() {

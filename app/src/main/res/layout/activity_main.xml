@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/my_bg"
+    android:background="@drawable/back"
     tools:context="com.techbytecare.kk.androideatclient.MainActivity">
 
     <LinearLayout
@@ -40,18 +40,18 @@
         android:layout_height="wrap_content">
 
         <info.hoang8f.widget.FButton
-            android:id="@+id/btnSignUp"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="SIGN UP"
-            android:textColor="@android:color/white"
-            android:layout_margin="8dp"
-            app:fButtonColor="@color/btnSignUp"
-            app:shadowColor="@android:color/black"
-            app:shadowEnabled="true"
-            app:shadowHeight="5dp"
-            app:cornerRadius="4dp" />
+        android:id="@+id/btnSignUp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="SIGN UP"
+        android:textColor="@android:color/white"
+        android:layout_margin="8dp"
+        app:fButtonColor="@color/btnSignUp"
+        app:shadowColor="@android:color/black"
+        app:shadowEnabled="true"
+        app:shadowHeight="5dp"
+        app:cornerRadius="4dp" />
 
         <info.hoang8f.widget.FButton
             android:id="@+id/btnSignIn"

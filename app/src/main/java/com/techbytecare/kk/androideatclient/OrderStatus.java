@@ -2,6 +2,7 @@ package com.techbytecare.kk.androideatclient;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -73,7 +74,7 @@ public class OrderStatus extends AppCompatActivity {
 
     private void loadOrders(String phoneNumber) {
 
-        Query getOrderByUser = requests.orderByChild("phone").equalTo(phoneNumber);
+        Query getOrderByUser = requests.orderByChild("Phone").equalTo(phoneNumber);
 
         FirebaseRecyclerOptions<Request> orderOptions = new FirebaseRecyclerOptions.Builder<Request>()
                 .setQuery(getOrderByUser,Request.class).build();

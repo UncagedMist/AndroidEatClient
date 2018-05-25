@@ -59,4 +59,15 @@ public class NotificationHelper extends ContextWrapper {
                 .setSound(soundUri)
                 .setAutoCancel(false);
     }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    public Notification.Builder getEatItChannelNotification(String title, String body, Uri soundUri)   {
+
+        return new Notification.Builder(getApplicationContext(),TBC_CHANNEL_ID)
+                .setContentTitle(title)
+                .setContentText(body)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSound(soundUri)
+                .setAutoCancel(false);
+    }
 }

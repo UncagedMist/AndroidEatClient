@@ -2,7 +2,6 @@ package com.techbytecare.kk.androideatclient;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Paint;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -28,7 +27,7 @@ import com.squareup.picasso.Picasso;
 import com.stepstone.apprating.AppRatingDialog;
 import com.stepstone.apprating.listener.RatingDialogListener;
 import com.techbytecare.kk.androideatclient.Common.Common;
-import com.techbytecare.kk.androideatclient.Database.DatabaseKK;
+import com.techbytecare.kk.androideatclient.Database.Database;
 import com.techbytecare.kk.androideatclient.Model.Food;
 import com.techbytecare.kk.androideatclient.Model.Order;
 import com.techbytecare.kk.androideatclient.Model.Rating;
@@ -104,7 +103,8 @@ public class FoodDetail extends AppCompatActivity implements RatingDialogListene
         btnCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new DatabaseKK(getBaseContext()).addToCart(new Order(
+                new Database(getBaseContext()).addToCart(new Order(
+                        Common.currentUser.getPhone(),
                         foodId,
                         currentFood.getName(),
                         numberButton.getNumber(),
@@ -116,7 +116,7 @@ public class FoodDetail extends AppCompatActivity implements RatingDialogListene
             }
         });
 
-        btnCart.setCount(new DatabaseKK(this).getCountCart());
+        btnCart.setCount(new Database(this).getCountCart(Common.currentUser.getPhone()));
 
         food_description = (TextView)findViewById(R.id.food_description);
         food_price = (TextView)findViewById(R.id.food_price);
@@ -140,7 +140,6 @@ public class FoodDetail extends AppCompatActivity implements RatingDialogListene
             }
             else {
                 Toast.makeText(this, "Please Check Your Internet Connection", Toast.LENGTH_SHORT).show();
-                return;
             }
         }
     }
@@ -190,7 +189,6 @@ public class FoodDetail extends AppCompatActivity implements RatingDialogListene
                 .setWindowAnimation(R.style.RatingDialogFadeAnim)
                 .create(FoodDetail.this)
                 .show();
-
     }
 
     private void getDetailFood(String foodId) {
@@ -213,7 +211,8 @@ public class FoodDetail extends AppCompatActivity implements RatingDialogListene
                 food_description.setText(currentFood.getDescription());
 
                 if (!currentFood.getDiscount().equals("0"))   {
-                    food_discount_price.setText("Discount : $"+" "+currentFood.getDiscount());
+                    food_discount_price.setVisibility(View.GONE);
+                    //food_discount_price.setText("Discount : $"+" "+currentFood.getDiscount());
                 }
                 else    {
                     food_discount_price.setVisibility(View.GONE);

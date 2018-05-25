@@ -86,7 +86,7 @@ public class SignUp extends AppCompatActivity {
                                     Toast.makeText(SignUp.this, "Already Registered!!!", Toast.LENGTH_SHORT).show();
                                     finish();
                                 }
-                                else {
+                                else    {
                                     mDialog.dismiss();
                                     User user = new User(edtName.getText().toString(), edtPassword.getText().toString(),
                                             edtSecureCode.getText().toString());
@@ -94,6 +94,7 @@ public class SignUp extends AppCompatActivity {
                                     table_user.child(edtPhone.getText().toString()).setValue(user);
 
                                     Toast.makeText(SignUp.this, "You are good to Go..", Toast.LENGTH_SHORT).show();
+                                    finish();
                                 }
                             }
 

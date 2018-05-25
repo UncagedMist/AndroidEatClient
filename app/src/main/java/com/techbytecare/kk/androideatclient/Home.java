@@ -9,6 +9,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -22,6 +23,7 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,11 +33,9 @@ import com.daimajia.slider.library.SliderLayout;
 import com.daimajia.slider.library.SliderTypes.BaseSliderView;
 import com.daimajia.slider.library.SliderTypes.TextSliderView;
 import com.facebook.accountkit.AccountKit;
-import com.facebook.login.LoginManager;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -43,10 +43,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.squareup.picasso.Picasso;
 import com.techbytecare.kk.androideatclient.Common.Common;
-import com.techbytecare.kk.androideatclient.Database.DatabaseKK;
+import com.techbytecare.kk.androideatclient.Database.Database;
 import com.techbytecare.kk.androideatclient.Interface.ItemClickListener;
 import com.techbytecare.kk.androideatclient.Model.Banner;
 import com.techbytecare.kk.androideatclient.Model.Category;
@@ -183,7 +184,7 @@ public class Home extends AppCompatActivity
             }
         });
 
-        fab.setCount(new DatabaseKK(this).getCountCart());
+        fab.setCount(new Database(this).getCountCart(Common.currentUser.getPhone()));
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -200,7 +201,7 @@ public class Home extends AppCompatActivity
         txtFullName.setText(Common.currentUser.getName());
 
         //load menu
-        recycler_menu = (RecyclerView)findViewById(R.id.recycler_menu);
+        recycler_menu = findViewById(R.id.recycler_menu);
         //recycler_menu.setHasFixedSize(true);
         //layoutManager = new LinearLayoutManager(this);
         //recycler_menu.setLayoutManager(layoutManager);
@@ -217,7 +218,7 @@ public class Home extends AppCompatActivity
     }
 
     private void setupSlider() {
-        mSlider = (SliderLayout)findViewById(R.id.slider);
+        mSlider = findViewById(R.id.slider);
         image_list = new HashMap<>();
 
         final DatabaseReference banners = database.getReference("Banner");
@@ -278,7 +279,7 @@ public class Home extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        fab.setCount(new DatabaseKK(this).getCountCart());
+        fab.setCount(new Database(this).getCountCart(Common.currentUser.getPhone()));
 
         //fix
         if (adapter != null)    {
@@ -304,8 +305,6 @@ public class Home extends AppCompatActivity
         recycler_menu.scheduleLayoutAnimation();
     }
 
-
-
     @Override
     protected void onStop() {
         super.onStop();
@@ -315,7 +314,7 @@ public class Home extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer =  findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -334,11 +333,10 @@ public class Home extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        /*
-        if (item.getItemId() == R.id.refresh)   {
-            loadMenu();
+
+        if (item.getItemId() == R.id.menu_search)   {
+            startActivity(new Intent(Home.this,SearchActivity.class));
         }
-        */
 
         return super.onOptionsItemSelected(item);
     }
@@ -358,6 +356,10 @@ public class Home extends AppCompatActivity
             Intent cartIntent = new Intent(Home.this,Cart.class);
             startActivity(cartIntent);
         }
+        else if (id == R.id.nav_fav) {
+            Intent intent = new Intent(Home.this,FavouritesActivity.class);
+            startActivity(intent);
+        }
         else if (id == R.id.nav_orders) {
             Intent orderStatusIntent = new Intent(Home.this,OrderStatus.class);
             startActivity(orderStatusIntent);
@@ -365,10 +367,16 @@ public class Home extends AppCompatActivity
         else if (id == R.id.nav_update_name)  {
             showUpdateNameDialog();
         }
+        else if (id == R.id.nav_setting)  {
+            showSettingDialog();
+        }
+
         else if (id == R.id.nav_log_out) {
             //delete remember user and password
             Paper.book().destroy();
 
+            //fb logout
+            AccountKit.logOut();
 
             //logout
             Intent signOutIntent = new Intent(Home.this,MainActivity.class);
@@ -378,6 +386,54 @@ public class Home extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void showSettingDialog() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(Home.this);
+        alertDialog.setTitle("SETTING");
+
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View layout_setting = inflater.inflate(R.layout.setting_layout,null);
+
+        final CheckBox ckb_sub_new = (CheckBox) layout_setting.findViewById(R.id.ckb_sub_new);
+
+        Paper.init(this);
+
+        String isSubscribe = Paper.book().read("sub_new");
+
+        if (isSubscribe == null || TextUtils.isEmpty(isSubscribe) || isSubscribe.equals("false"))   {
+            ckb_sub_new.setChecked(false);
+        }
+        else    {
+            ckb_sub_new.setChecked(true);
+        }
+
+        alertDialog.setView(layout_setting);
+
+        alertDialog.setPositiveButton("SUBSCRIBE", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int which) {
+                dialogInterface.dismiss();
+
+                if (ckb_sub_new.isChecked())    {
+                    FirebaseMessaging.getInstance().subscribeToTopic(Common.topicName);
+
+                    Paper.book().write("sub_new","true");
+                }
+                else    {
+                    FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.topicName);
+
+                    Paper.book().write("sub_new","false");
+                }
+            }
+        });
+        alertDialog.setNegativeButton("LEAVE", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int which) {
+                dialogInterface.dismiss();
+            }
+        });
+        alertDialog.show();
     }
 
     private void showHomeAddressDialog() {
@@ -392,13 +448,13 @@ public class Home extends AppCompatActivity
 
         alertDialog.setView(layout_home);
 
-        alertDialog.setPositiveButton("UPDATE", new DialogInterface.OnClickListener() {
+        alertDialog.setPositiveButton("UPDATE ADDRESS", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int which) {
                 dialogInterface.dismiss();
 
                 //set new home address
-                Common.currentUser.setHomeAddress(edtHomeAddress.getText().toString());
+               Common.currentUser.setHomeAddress(edtHomeAddress.getText().toString());
 
                 FirebaseDatabase.getInstance().getReference("User").child(Common.currentUser.getPhone())
                         .setValue(Common.currentUser).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -409,10 +465,17 @@ public class Home extends AppCompatActivity
                         });
             }
         });
+        alertDialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int which) {
+                dialogInterface.dismiss();
+            }
+        });
         alertDialog.show();
     }
 
     private void showUpdateNameDialog() {
+
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(Home.this);
         alertDialog.setTitle("UPDATE NAME");
         alertDialog.setMessage("Please Fill all information..");
@@ -424,7 +487,7 @@ public class Home extends AppCompatActivity
 
         alertDialog.setView(layout_update_name);
         //Button
-        alertDialog.setPositiveButton("UPDATE", new DialogInterface.OnClickListener() {
+        alertDialog.setPositiveButton("UPDATE NAME", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int which) {
                 //change password here

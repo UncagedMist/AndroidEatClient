@@ -8,7 +8,9 @@ import android.view.ViewGroup;
 import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
 import com.squareup.picasso.Picasso;
 import com.techbytecare.kk.androideatclient.Cart;
-import com.techbytecare.kk.androideatclient.Database.DatabaseKK;
+import com.techbytecare.kk.androideatclient.Common.Common;
+import com.techbytecare.kk.androideatclient.Database.Database;
+import com.techbytecare.kk.androideatclient.Model.Food;
 import com.techbytecare.kk.androideatclient.Model.Order;
 import com.techbytecare.kk.androideatclient.R;
 import com.techbytecare.kk.androideatclient.ViewHolder.CartViewHolder;
@@ -26,6 +28,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartViewHolder> {
 
     private List<Order> listData = new ArrayList<>();
     private Cart cart;
+
+    Food currentFood;
 
     public CartAdapter(List<Order> listData, Cart cart) {
         this.listData = listData;
@@ -56,38 +60,52 @@ public class CartAdapter extends RecyclerView.Adapter<CartViewHolder> {
             public void onValueChange(ElegantNumberButton view, int oldValue, int newValue) {
                 Order order = listData.get(position);
                 order.setQuantity(String.valueOf(newValue));
-                new DatabaseKK(cart).updateCart(order);
+                new Database(cart).updateCart(order);
 
                 //calculate total price
                 int total = 0;
-                List<Order> orders = new DatabaseKK(cart).getCarts();
+                List<Order> orders = new Database(cart).getCarts(Common.currentUser.getPhone());
 
-                for (Order item : orders)    {
-                    //total += (Integer.parseInt(order.getPrice())) * (Integer.parseInt(item.getQuantity()));
+                for (Order item : orders)
+                    total += (Integer.parseInt(order.getPrice())) * (Integer.parseInt(item.getQuantity()));
 
-                    total += ((Integer.parseInt(order.getPrice())) * (Integer.parseInt(order.getQuantity())))
-                            - ((Integer.parseInt(order.getDiscount())) * (Integer.parseInt(order.getQuantity())));
-
+                    //total += ((Integer.parseInt(order.getPrice())) * (Integer.parseInt(order.getQuantity())))
+                                //- ((Integer.parseInt(order.getDiscount())) * (Integer.parseInt(order.getQuantity())));
 
                     Locale locale = new Locale("en","US");
                     NumberFormat fmt = NumberFormat.getCurrencyInstance(locale);
 
                     cart.txtTotalPrice.setText(fmt.format(total));
                 }
-            }
         });
 
-            Locale locale = new Locale("en","US");
-            NumberFormat fmt = NumberFormat.getCurrencyInstance(locale);
-            //int price = (Integer.parseInt(listData.get(position).getPrice()))*(Integer.parseInt(listData.get(position).getQuantity()));
-            int price = ((Integer.parseInt(listData.get(position).getPrice()))*(Integer.parseInt(listData.get(position).getQuantity())))
-                    - ((Integer.parseInt(listData.get(position).getDiscount())) * (Integer.parseInt(listData.get(position).getQuantity())));
+        Locale locale = new Locale("en","US");
+        NumberFormat fmt = NumberFormat.getCurrencyInstance(locale);
 
-            holder.txt_price.setText(fmt.format(price));
-            holder.txt_cart_name.setText(listData.get(position).getProductName());
+        int price = (Integer.parseInt(listData.get(position).getPrice()))*(Integer.parseInt(listData.get(position).getQuantity()));
+
+        //int price = ((Integer.parseInt(listData.get(position).getPrice())) * (Integer.parseInt(listData.get(position).getQuantity())))
+            //- ((Integer.parseInt(listData.get(position).getDiscount())) * (Integer.parseInt(listData.get(position).getQuantity())));
+
+        holder.txt_price.setText(fmt.format(price));
+        holder.txt_cart_name.setText(listData.get(position).getProductName());
     }
     @Override
     public int getItemCount() {
         return listData.size();
+    }
+
+    public Order getItem(int position)  {
+        return listData.get(position);
+    }
+
+    public void removeItem(int position)    {
+        listData.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    public void restoreItem(Order item,int position)    {
+        listData.add(position,item);
+        notifyItemInserted(position);
     }
 }

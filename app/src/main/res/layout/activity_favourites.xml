@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.SwipeRefreshLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/swipe_layout"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@drawable/back"
+    android:id="@+id/root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.techbytecare.kk.androideatclient.ShowComment">
+    android:orientation="vertical"
+    android:background="@drawable/back"
+    tools:context="com.techbytecare.kk.androideatclient.FavouritesActivity">
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerComment"
+        android:id="@+id/recycler_fav"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:scrollbars="vertical">
 
     </android.support.v7.widget.RecyclerView>
 
-</android.support.v4.widget.SwipeRefreshLayout>
+</RelativeLayout>

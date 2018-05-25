@@ -1,7 +1,7 @@
 package com.techbytecare.kk.androideatclient.Remote;
 
+import com.techbytecare.kk.androideatclient.Model.DataMessage;
 import com.techbytecare.kk.androideatclient.Model.MyResponse;
-import com.techbytecare.kk.androideatclient.Model.Sender;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -20,5 +20,5 @@ public interface APIService {
             }
     )
     @POST("fcm/send")
-    Call<MyResponse> sendNotification(@Body Sender body);
+    Call<MyResponse> sendNotification(@Body DataMessage body);
 }
